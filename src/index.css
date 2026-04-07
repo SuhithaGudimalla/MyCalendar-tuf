@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 20% 96%;
+    --foreground: 220 20% 15%;
+    --card: 30 25% 98%;
+    --card-foreground: 220 20% 15%;
+    --popover: 30 25% 98%;
+    --popover-foreground: 220 20% 15%;
+    --primary: 220 60% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 20% 92%;
+    --secondary-foreground: 220 20% 20%;
+    --muted: 30 15% 90%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 340 65% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 15% 85%;
+    --input: 30 15% 85%;
+    --ring: 220 60% 50%;
+    --radius: 0.75rem;
+
+    --calendar-paper: 35 30% 97%;
+    --calendar-shadow: 220 20% 80%;
+    --calendar-today: 220 60% 50%;
+    --calendar-weekend: 340 65% 55%;
+    --calendar-range: 220 60% 92%;
+    --calendar-hover: 220 60% 96%;
+    --calendar-note-dot: 340 65% 55%;
+
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-handwriting: 'Caveat', cursive;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 8%;
+    --foreground: 30 20% 92%;
+    --card: 220 18% 12%;
+    --card-foreground: 30 20% 92%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 30 20% 92%;
+    --primary: 220 60% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 30 20% 90%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 340 65% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 22%;
+    --input: 220 15% 22%;
+    --ring: 220 60% 60%;
+
+    --calendar-paper: 220 18% 14%;
+    --calendar-shadow: 220 20% 5%;
+    --calendar-today: 220 60% 60%;
+    --calendar-weekend: 340 65% 60%;
+    --calendar-range: 220 40% 22%;
+    --calendar-hover: 220 30% 20%;
+    --calendar-note-dot: 340 65% 60%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Paper texture with visible grain + crumpled effect */
+.paper-texture {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.015' numOctaves='3'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='2'/%3E%3C/filter%3E%3Crect width='400' height='400' fill='rgba(139,119,101,0.02)'/%3E%3C/svg%3E");
+}
+
+/* Calendar card depth */
+.calendar-card {
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+.calendar-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, hsl(var(--calendar-paper) / 0.15) 0%, transparent 20%, transparent 80%, hsl(var(--calendar-shadow) / 0.05) 100%);
+  box-shadow: inset 0 2px 4px hsl(var(--calendar-paper) / 0.3), inset 0 -1px 2px hsl(var(--calendar-shadow) / 0.1);
+  z-index: 1;
+}
+.calendar-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 28px,
+    hsl(var(--border) / 0.06) 28px,
+    hsl(var(--border) / 0.06) 29px
+  );
+  z-index: 1;
+}
+
+/* Spiral binding */
+.spiral-ring {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid hsl(var(--muted-foreground) / 0.35);
+  background: linear-gradient(145deg, hsl(var(--muted) / 0.8), hsl(var(--background)));
+  position: relative;
+  box-shadow: 0 1px 3px hsl(var(--calendar-shadow) / 0.3), inset 0 1px 1px hsl(var(--background) / 0.5);
+}
+.spiral-ring::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  background: linear-gradient(180deg, hsl(var(--muted-foreground) / 0.35), hsl(var(--muted-foreground) / 0.15));
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+/* Snowfall animation - full viewport */
+@keyframes snowfall {
+  0% { transform: translateY(-5vh) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateY(50vh) translateX(30px); }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(105vh) translateX(-15px); opacity: 0; }
+}
+@keyframes leaffall {
+  0% { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  25% { transform: translateY(25vh) rotate(90deg) translateX(40px); }
+  50% { transform: translateY(50vh) rotate(180deg) translateX(-20px); }
+  75% { transform: translateY(75vh) rotate(270deg) translateX(30px); }
+  100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+}
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  25% { transform: translateY(-15px) translateX(8px); opacity: 0.7; }
+  50% { transform: translateY(-25px) translateX(-5px); opacity: 1; }
+  75% { transform: translateY(-10px) translateX(12px); opacity: 0.6; }
+}
+
+.seasonal-particle {
+  position: absolute;
+  pointer-events: none;
+}
+.snow-particle {
+  animation: snowfall linear infinite;
+}
+.leaf-particle {
+  animation: leaffall ease-in-out infinite;
+}
+.spring-particle {
+  animation: float-particle ease-in-out infinite;
+}
+
+/* Confetti */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  animation: confetti-fall linear forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
