@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   addMonths, subMonths, eachDayOfInterval, isSameDay,
-  isToday, isWeekend, format, differenceInDays, isBefore, isAfter
+  isToday, isWeekend, format, differenceInDays, isBefore, isAfter, parse
 } from 'date-fns';
 
 export interface CalendarNote {
@@ -20,12 +20,26 @@ const STORAGE_KEYS = {
   heroImage: 'calendar-hero-image',
   birthday: 'calendar-birthday',
   theme: 'calendar-theme',
+  range: 'calendar-range',
 };
 
 export function useCalendarState() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null });
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEYS.range);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const start = parsed.start ? parse(parsed.start, 'yyyy-MM-dd', new Date()) : null;
+        const end = parsed.end ? parse(parsed.end, 'yyyy-MM-dd', new Date()) : null;
+        if (start && end && !isNaN(start.getTime()) && !isNaN(end.getTime())) {
+          return { start, end };
+        }
+      }
+    } catch {}
+    return { start: null, end: null };
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [notes, setNotes] = useState<Record<string, string>>(() => {
     try {
@@ -62,6 +76,20 @@ export function useCalendarState() {
     else localStorage.removeItem(STORAGE_KEYS.birthday);
   }, [birthday]);
 
+  useEffect(() => {
+    if (dateRange.start && dateRange.end) {
+      try {
+        const serialized = {
+          start: format(dateRange.start, 'yyyy-MM-dd'),
+          end: format(dateRange.end, 'yyyy-MM-dd')
+        };
+        localStorage.setItem(STORAGE_KEYS.range, JSON.stringify(serialized));
+      } catch {}
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.range);
+    }
+  }, [dateRange]);
+
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
@@ -70,12 +98,11 @@ export function useCalendarState() {
     return eachDayOfInterval({ start: calStart, end: calEnd });
   }, [currentMonth]);
 
-
-
   const goNextMonth = useCallback(() => {
     setFlipDirection(1);
     setCurrentMonth(m => addMonths(m, 1));
   }, []);
+
   const goPrevMonth = useCallback(() => {
     setFlipDirection(-1);
     setCurrentMonth(m => subMonths(m, 1));
@@ -157,3 +184,4 @@ export function useCalendarState() {
     isDark, setIsDark,
   };
 }
+

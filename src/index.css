@@ -29,11 +29,11 @@
 
     --calendar-paper: 35 30% 97%;
     --calendar-shadow: 220 20% 80%;
-    --calendar-today: 220 60% 50%;
-    --calendar-weekend: 340 65% 55%;
-    --calendar-range: 220 60% 92%;
-    --calendar-hover: 220 60% 96%;
-    --calendar-note-dot: 340 65% 55%;
+    --calendar-today: 330 90% 65%;
+    --calendar-weekend: 330 90% 60%;
+    --calendar-range: 330 75% 90%;
+    --calendar-hover: 330 75% 80%;
+    --calendar-note-dot: 330 35% 30%;
 
     --font-heading: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -94,7 +94,8 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background: linear-gradient(180deg, #fdf2f8 0%, #fce7f3 100%);
+    @apply text-foreground;
     font-family: var(--font-body);
   }
   h1, h2, h3, h4, h5, h6 {

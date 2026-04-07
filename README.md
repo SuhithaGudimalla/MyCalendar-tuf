@@ -1,3 +1,8 @@
-# Welcome to your Lovable project
+# Calendar TUF
 
-TODO: Document your project here
+Standalone React calendar app with notes, range selection, themes, birthday confetti, and monthly animations.
+
+## Run
+
+npm install
+npm run dev
