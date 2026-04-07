@@ -1,18 +1,36 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  addMonths, subMonths, eachDayOfInterval, isSameDay,
-  isToday, isWeekend, format, differenceInDays, isBefore, isAfter, parse
+  addMonths, subMonths, eachDayOfInterval, format, differenceInDays, isBefore
 } from 'date-fns';
-
-export interface CalendarNote {
-  date: string;
-  text: string;
-}
 
 export interface DateRange {
   start: Date | null;
   end: Date | null;
+}
+
+export type TaskPriority = 'low' | 'medium' | 'high';
+
+export interface TaskRange {
+  id: string;
+  start: string;
+  end: string;
+  taskTitle: string;
+  taskDescription: string;
+  priority: TaskPriority;
+  color: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface ImportantDate {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  color: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 const STORAGE_KEYS = {
@@ -20,31 +38,32 @@ const STORAGE_KEYS = {
   heroImage: 'calendar-hero-image',
   birthday: 'calendar-birthday',
   theme: 'calendar-theme',
-  range: 'calendar-range',
+  ranges: 'calendar-ranges',
+  importantDates: 'calendar-important-dates',
+  moods: 'calendar-moods',
 };
+
+const DEFAULT_PASTEL_COLORS = ['#F8BBD0', '#D9C2FF', '#FFD8B5', '#BFE7FF', '#C7F2D4'] as const;
+
+function toKey(date: Date) {
+  return format(date, 'yyyy-MM-dd');
+}
+
+function uid() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 export function useCalendarState() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [dateRange, setDateRange] = useState<DateRange>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.range);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        const start = parsed.start ? parse(parsed.start, 'yyyy-MM-dd', new Date()) : null;
-        const end = parsed.end ? parse(parsed.end, 'yyyy-MM-dd', new Date()) : null;
-        if (start && end && !isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          return { start, end };
-        }
-      }
-    } catch {}
-    return { start: null, end: null };
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [draftRange, setDraftRange] = useState<DateRange>({ start: null, end: null });
+  const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+  const [isRangeModalOpen, setIsRangeModalOpen] = useState(false);
+  const [activeRangeId, setActiveRangeId] = useState<string | null>(null);
+  const [editingRangeId, setEditingRangeId] = useState<string | null>(null);
+
   const [notes, setNotes] = useState<Record<string, string>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.notes) || '{}');
-    } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.notes) || '{}'); } catch { return {}; }
   });
   const [heroImage, setHeroImage] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEYS.heroImage)
@@ -52,10 +71,40 @@ export function useCalendarState() {
   const [birthday, setBirthday] = useState<string | null>(() =>
     localStorage.getItem(STORAGE_KEYS.birthday)
   );
-  const [isDark, setIsDark] = useState(() =>
-    localStorage.getItem(STORAGE_KEYS.theme) === 'dark'
-  );
+  const [isDark, setIsDark] = useState(() => {
+    const storedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+    // Default to dark mode when the user has no previous preference.
+    if (!storedTheme) return true;
+    return storedTheme === 'dark';
+  });
   const [flipDirection, setFlipDirection] = useState<1 | -1>(1);
+
+  const [ranges, setRanges] = useState<TaskRange[]>(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEYS.ranges) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [importantDates, setImportantDates] = useState<ImportantDate[]>(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEYS.importantDates) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [moods, setMoods] = useState<Record<string, string>>(() => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEYS.moods) || '{}');
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
@@ -67,6 +116,18 @@ export function useCalendarState() {
   }, [notes]);
 
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.ranges, JSON.stringify(ranges));
+  }, [ranges]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.importantDates, JSON.stringify(importantDates));
+  }, [importantDates]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.moods, JSON.stringify(moods));
+  }, [moods]);
+
+  useEffect(() => {
     if (heroImage) localStorage.setItem(STORAGE_KEYS.heroImage, heroImage);
     else localStorage.removeItem(STORAGE_KEYS.heroImage);
   }, [heroImage]);
@@ -75,20 +136,6 @@ export function useCalendarState() {
     if (birthday) localStorage.setItem(STORAGE_KEYS.birthday, birthday);
     else localStorage.removeItem(STORAGE_KEYS.birthday);
   }, [birthday]);
-
-  useEffect(() => {
-    if (dateRange.start && dateRange.end) {
-      try {
-        const serialized = {
-          start: format(dateRange.start, 'yyyy-MM-dd'),
-          end: format(dateRange.end, 'yyyy-MM-dd')
-        };
-        localStorage.setItem(STORAGE_KEYS.range, JSON.stringify(serialized));
-      } catch {}
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.range);
-    }
-  }, [dateRange]);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -110,41 +157,122 @@ export function useCalendarState() {
 
   const handleDateClick = useCallback((day: Date) => {
     setSelectedDate(day);
-    setIsModalOpen(true);
+    setIsNotesModalOpen(true);
   }, []);
 
   const handleRangeClick = useCallback((day: Date) => {
-    setDateRange(prev => {
-      if (!prev.start || (prev.start && prev.end)) {
+    setDraftRange(prev => {
+      if (!prev.start || prev.end) {
+        setActiveRangeId(null);
+        setEditingRangeId(null);
         return { start: day, end: null };
       }
-      if (isBefore(day, prev.start)) {
-        return { start: day, end: prev.start };
-      }
-      return { ...prev, end: day };
+      const next = isBefore(day, prev.start) ? { start: day, end: prev.start } : { start: prev.start, end: day };
+      setIsRangeModalOpen(true);
+      return next;
     });
   }, []);
 
-  const resetRange = useCallback(() => setDateRange({ start: null, end: null }), []);
+  const resetDraftRange = useCallback(() => {
+    setDraftRange({ start: null, end: null });
+    setIsRangeModalOpen(false);
+    setEditingRangeId(null);
+  }, []);
 
-  const isInRange = useCallback((day: Date) => {
-    if (!dateRange.start || !dateRange.end) return false;
-    return (isAfter(day, dateRange.start) || isSameDay(day, dateRange.start)) &&
-           (isBefore(day, dateRange.end) || isSameDay(day, dateRange.end));
-  }, [dateRange]);
+  const getRangesForDay = useCallback((day: Date) => {
+    const key = toKey(day);
+    return ranges.filter(r => r.start <= key && r.end >= key);
+  }, [ranges]);
 
-  const isRangeStart = useCallback((day: Date) =>
-    dateRange.start ? isSameDay(day, dateRange.start) : false
-  , [dateRange.start]);
+  const getPreferredRangeForDay = useCallback((day: Date) => {
+    const list = getRangesForDay(day);
+    if (!list.length) return null;
+    const active = activeRangeId ? list.find(r => r.id === activeRangeId) : null;
+    return active || list[0];
+  }, [activeRangeId, getRangesForDay]);
 
-  const isRangeEnd = useCallback((day: Date) =>
-    dateRange.end ? isSameDay(day, dateRange.end) : false
-  , [dateRange.end]);
+  const getImportantDateForDay = useCallback((day: Date) => {
+    const key = toKey(day);
+    return importantDates.find(d => d.date === key) || null;
+  }, [importantDates]);
 
-  const rangeDuration = useMemo(() => {
-    if (!dateRange.start || !dateRange.end) return null;
-    return differenceInDays(dateRange.end, dateRange.start) + 1;
-  }, [dateRange]);
+  const getMoodEmojiForDay = useCallback((day: Date) => {
+    const key = toKey(day);
+    return moods[key] || '';
+  }, [moods]);
+
+  const saveMood = useCallback((date: string, emoji: string) => {
+    setMoods(prev => ({ ...prev, [date]: emoji }));
+  }, []);
+
+  const clearMood = useCallback((date: string) => {
+    setMoods(prev => {
+      const next = { ...prev };
+      delete next[date];
+      return next;
+    });
+  }, []);
+
+  const draftRangeDuration = useMemo(() => {
+    if (!draftRange.start || !draftRange.end) return null;
+    return differenceInDays(draftRange.end, draftRange.start) + 1;
+  }, [draftRange]);
+
+  const activeRange = useMemo(
+    () => (activeRangeId ? ranges.find(r => r.id === activeRangeId) || null : null),
+    [activeRangeId, ranges],
+  );
+
+  const selectRange = useCallback((rangeId: string | null) => {
+    setActiveRangeId(rangeId);
+  }, []);
+
+  const startEditRange = useCallback((rangeId: string) => {
+    setEditingRangeId(rangeId);
+    setIsRangeModalOpen(true);
+    setActiveRangeId(rangeId);
+    setDraftRange({ start: null, end: null });
+  }, []);
+
+  const deleteRange = useCallback((rangeId: string) => {
+    setRanges(prev => prev.filter(r => r.id !== rangeId));
+    setActiveRangeId(prev => (prev === rangeId ? null : prev));
+  }, []);
+
+  const saveRange = useCallback(
+    (input: Omit<TaskRange, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => {
+      const now = Date.now();
+      const id = input.id || editingRangeId || uid();
+      setRanges(prev => {
+        const existing = prev.find(r => r.id === id);
+        const next: TaskRange = existing
+          ? { ...existing, ...input, id, updatedAt: now }
+          : { ...input, id, createdAt: now, updatedAt: now };
+        return [next, ...prev.filter(r => r.id !== id)];
+      });
+      setActiveRangeId(id);
+      setEditingRangeId(null);
+      setIsRangeModalOpen(false);
+      setDraftRange({ start: null, end: null });
+    },
+    [editingRangeId],
+  );
+
+  const upsertImportantDate = useCallback((input: Omit<ImportantDate, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => {
+    const now = Date.now();
+    const id = input.id || uid();
+    setImportantDates(prev => {
+      const existing = prev.find(d => d.id === id);
+      const next: ImportantDate = existing
+        ? { ...existing, ...input, id, updatedAt: now }
+        : { ...input, id, createdAt: now, updatedAt: now };
+      return [next, ...prev.filter(d => d.id !== id)].sort((a, b) => a.date.localeCompare(b.date));
+    });
+  }, []);
+
+  const deleteImportantDate = useCallback((id: string) => {
+    setImportantDates(prev => prev.filter(d => d.id !== id));
+  }, []);
 
   const saveNote = useCallback((date: string, text: string) => {
     setNotes(prev => ({ ...prev, [date]: text }));
@@ -176,12 +304,18 @@ export function useCalendarState() {
     currentMonth, currentMonthNum, calendarDays, flipDirection,
     goNextMonth, goPrevMonth,
     selectedDate, handleDateClick, handleRangeClick,
-    dateRange, resetRange, isInRange, isRangeStart, isRangeEnd, rangeDuration,
-    isModalOpen, setIsModalOpen,
+    draftRange, draftRangeDuration, resetDraftRange,
+    ranges, activeRangeId, activeRange, selectRange, startEditRange, deleteRange, saveRange,
+    getRangesForDay, getPreferredRangeForDay,
+    importantDates, getImportantDateForDay, upsertImportantDate, deleteImportantDate,
+    moods, getMoodEmojiForDay, saveMood, clearMood,
+    isNotesModalOpen, setIsNotesModalOpen,
+    isRangeModalOpen, setIsRangeModalOpen, editingRangeId,
     notes, saveNote, deleteNote, hasNote,
     heroImage, setHeroImage,
     birthday, setBirthday, isBirthdayToday,
     isDark, setIsDark,
+    DEFAULT_PASTEL_COLORS,
   };
 }
 

@@ -12,11 +12,12 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isDark, setIsDark, birthday, setBirthday }) => {
   const [showBday, setShowBday] = useState(false);
   const [bdayInput, setBdayInput] = useState(birthday || '');
+  const calendarTitle = 'Paper Planner';
 
   return (
     <div className="flex items-center justify-between mb-2 px-1">
-      <h1 className="text-lg font-heading font-bold text-foreground tracking-tight">
-        My Calendar
+      <h1 className="text-xl font-handwriting font-semibold text-foreground tracking-wide">
+        {calendarTitle}
       </h1>
       <div className="flex items-center gap-1.5">
         <motion.button

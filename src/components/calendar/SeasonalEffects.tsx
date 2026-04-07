@@ -13,30 +13,29 @@ const SeasonalEffects: React.FC<{ month: number }> = ({ month }) => {
   const season = getSeason(month);
 
   const particles = useMemo(() => {
-    const count = season === 'summer' ? 0 : 30;
+    const count = season === 'summer' ? 26 : 30;
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
-      delay: Math.random() * 8,
+      // negative delay makes particles appear already in motion on mount
+      delay: -(Math.random() * 12),
       duration: 5 + Math.random() * 6,
       size: 4 + Math.random() * 8,
       swayAmount: 20 + Math.random() * 40,
+      startTop: -(8 + Math.random() * 92),
     }));
   }, [season]);
 
-  if (season === 'summer') {
-    return (
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(ellipse at top, rgba(255,200,50,0.08) 0%, transparent 50%)',
-        }}
-      />
-    );
-  }
-
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      {season === 'summer' && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at top, rgba(255,200,50,0.08) 0%, transparent 50%)',
+          }}
+        />
+      )}
       {particles.map(p => {
         if (season === 'winter') {
           return (
@@ -45,6 +44,7 @@ const SeasonalEffects: React.FC<{ month: number }> = ({ month }) => {
               className="seasonal-particle snow-particle"
               style={{
                 left: `${p.left}%`,
+                top: `${p.startTop}vh`,
                 width: p.size,
                 height: p.size,
                 borderRadius: '50%',
@@ -64,6 +64,7 @@ const SeasonalEffects: React.FC<{ month: number }> = ({ month }) => {
               className="seasonal-particle leaf-particle"
               style={{
                 left: `${p.left}%`,
+                top: `${p.startTop}vh`,
                 width: p.size + 4,
                 height: p.size + 2,
                 borderRadius: '50% 0 50% 0',
@@ -75,20 +76,22 @@ const SeasonalEffects: React.FC<{ month: number }> = ({ month }) => {
             />
           );
         }
-        // spring
-        const springColors = ['#f8c8dc', '#c8e6c9', '#fff9c4', '#bbdefb', '#f3e5f5', '#dcedc8'];
+        // spring + summer flowers
+        const flowerColors = season === 'summer'
+          ? ['#ffd6e7', '#ffe7b3', '#ffd9f6', '#fff2cc', '#ffc9de', '#ffe2a8']
+          : ['#f8c8dc', '#ffdff0', '#f3e5f5', '#ffe4f2', '#f9d4e8', '#fce4ec'];
         return (
           <div
             key={p.id}
-            className="seasonal-particle spring-particle"
+            className="seasonal-particle flower-particle"
             style={{
               left: `${p.left}%`,
-              top: `${10 + Math.random() * 80}%`,
-              width: p.size,
-              height: p.size,
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${springColors[p.id % springColors.length]}, transparent)`,
-              opacity: 0.5,
+              top: `${p.startTop}vh`,
+              width: p.size + 3,
+              height: p.size + 3,
+              borderRadius: '50% 40% 55% 45%',
+              background: `radial-gradient(circle, ${flowerColors[p.id % flowerColors.length]}, rgba(255,255,255,0.25))`,
+              opacity: season === 'summer' ? 0.65 : 0.55,
               animationDuration: `${p.duration}s`,
               animationDelay: `${p.delay}s`,
             }}

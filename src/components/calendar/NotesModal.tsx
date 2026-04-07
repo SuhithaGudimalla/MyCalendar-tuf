@@ -3,22 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { X, Trash2 } from 'lucide-react';
 
+const MOOD_OPTIONS = ['😀', '🙂', '😊', '😌', '😎', '🥳', '😴', '😔', '😤', '🤒', '🤩', '🥰'];
+
 interface NotesModalProps {
   isOpen: boolean;
   onClose: () => void;
   date: Date | null;
   notes: Record<string, string>;
+  moods: Record<string, string>;
   onSave: (date: string, text: string) => void;
   onDelete: (date: string) => void;
+  onSaveMood: (date: string, emoji: string) => void;
+  onClearMood: (date: string) => void;
 }
 
-const NotesModal: React.FC<NotesModalProps> = ({ isOpen, onClose, date, notes, onSave, onDelete }) => {
+const NotesModal: React.FC<NotesModalProps> = ({ isOpen, onClose, date, notes, moods, onSave, onDelete, onSaveMood, onClearMood }) => {
   const dateKey = date ? format(date, 'yyyy-MM-dd') : '';
   const [text, setText] = useState('');
+  const [selectedMood, setSelectedMood] = useState('');
 
   useEffect(() => {
-    if (date) setText(notes[dateKey] || '');
-  }, [date, dateKey, notes]);
+    if (date) {
+      setText(notes[dateKey] || '');
+      setSelectedMood(moods[dateKey] || '');
+    }
+  }, [date, dateKey, notes, moods]);
 
   if (!date) return null;
 
@@ -54,7 +63,33 @@ const NotesModal: React.FC<NotesModalProps> = ({ isOpen, onClose, date, notes, o
                 <X size={18} className="text-muted-foreground" />
               </motion.button>
             </div>
-            <div className="p-4">
+            <div className="p-4 space-y-3">
+              <div>
+                <p className="text-[11px] text-muted-foreground font-body mb-2">Mood diary</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {MOOD_OPTIONS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setSelectedMood(emoji)}
+                      className={`w-8 h-8 rounded-lg border text-sm transition ${
+                        selectedMood === emoji ? 'border-ring bg-secondary' : 'border-input hover:bg-secondary/50'
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                  {selectedMood && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMood('')}
+                      className="px-2 py-1 rounded-md text-[11px] text-muted-foreground border border-input hover:bg-secondary/50"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
               <textarea
                 value={text}
                 onChange={e => setText(e.target.value)}
@@ -68,7 +103,7 @@ const NotesModal: React.FC<NotesModalProps> = ({ isOpen, onClose, date, notes, o
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => { onDelete(dateKey); onClose(); }}
+                onClick={() => { onDelete(dateKey); onClearMood(dateKey); onClose(); }}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 font-body"
               >
                 <Trash2 size={14} /> Delete
@@ -76,7 +111,12 @@ const NotesModal: React.FC<NotesModalProps> = ({ isOpen, onClose, date, notes, o
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => { onSave(dateKey, text); onClose(); }}
+                onClick={() => {
+                  onSave(dateKey, text);
+                  if (selectedMood) onSaveMood(dateKey, selectedMood);
+                  else onClearMood(dateKey);
+                  onClose();
+                }}
                 className="px-4 py-1.5 rounded-lg text-sm bg-primary text-primary-foreground font-body font-medium"
               >
                 Save

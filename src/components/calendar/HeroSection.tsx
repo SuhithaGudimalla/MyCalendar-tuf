@@ -4,18 +4,23 @@ import { format } from 'date-fns';
 import { Camera } from 'lucide-react';
 
 const DEFAULT_IMAGES: Record<number, string> = {
-  0: 'linear-gradient(135deg, #667eea, #764ba2)',
-  1: 'linear-gradient(135deg, #f093fb, #f5576c)',
-  2: 'linear-gradient(135deg, #4facfe, #00f2fe)',
-  3: 'linear-gradient(135deg, #43e97b, #38f9d7)',
-  4: 'linear-gradient(135deg, #fa709a, #fee140)',
-  5: 'linear-gradient(135deg, #a18cd1, #fbc2eb)',
-  6: 'linear-gradient(135deg, #ffecd2, #fcb69f)',
-  7: 'linear-gradient(135deg, #ff9a9e, #fecfef)',
-  8: 'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-  9: 'linear-gradient(135deg, #d4fc79, #96e6a1)',
-  10: 'linear-gradient(135deg, #84fab0, #8fd3f4)',
-  11: 'linear-gradient(135deg, #a6c0fe, #f68084)',
+  // Winter
+  0: 'https://images.unsplash.com/photo-1483664852095-d6cc6870702d?auto=format&fit=crop&w=1600&q=80',
+  1: 'https://images.unsplash.com/photo-1482192505345-5655af888cc4?auto=format&fit=crop&w=1600&q=80',
+  // Spring
+  2: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1600&q=80',
+  3: 'https://images.unsplash.com/photo-1470093851219-69951fcbb533?auto=format&fit=crop&w=1600&q=80',
+  4: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80',
+  // Summer
+  5: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80',
+  6: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80',
+  7: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=80',
+  // Autumn
+  8: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80',
+  9: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
+  10: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1600&q=80',
+  // Late autumn / early winter
+  11: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1600&q=80',
 };
 
 interface HeroSectionProps {
@@ -37,8 +42,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ currentMonth, heroImage, setH
   };
 
   const bgStyle = heroImage
-    ? { backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-    : { background: DEFAULT_IMAGES[monthNum] };
+    ? {
+        backgroundImage: `linear-gradient(rgba(10, 14, 24, 0.2), rgba(10, 14, 24, 0.2)), url(${heroImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {
+        backgroundImage: `linear-gradient(rgba(10, 14, 24, 0.24), rgba(10, 14, 24, 0.24)), url(${DEFAULT_IMAGES[monthNum]})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      };
 
   return (
     <div className="relative overflow-hidden rounded-t-xl" style={{ height: 140 }}>

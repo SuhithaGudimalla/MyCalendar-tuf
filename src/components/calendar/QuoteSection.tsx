@@ -1,36 +1,29 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
-const QUOTES = [
-  "The only way to do great work is to love what you do.",
-  "Every day is a fresh start.",
-  "Believe you can and you're halfway there.",
-  "Happiness depends upon ourselves.",
-  "The best time for new beginnings is now.",
-  "What lies behind us is nothing compared to what lies ahead.",
-  "Be the change you wish to see in the world.",
-  "Life is what happens when you're busy making other plans.",
-  "Simplicity is the ultimate sophistication.",
-  "In the middle of difficulty lies opportunity.",
-  "The journey of a thousand miles begins with a single step.",
-  "Stars can't shine without darkness.",
-  "Do what you can, with what you have, where you are.",
-  "Every moment is a fresh beginning.",
-  "The future belongs to those who believe in their dreams.",
-  "Act as if what you do makes a difference. It does.",
-  "Turn your wounds into wisdom.",
-  "Life is short. Smile while you still have teeth.",
-  "Your only limit is your mind.",
-  "Difficult roads often lead to beautiful destinations.",
-];
+const QUOTES_BY_MONTH = [
+  'New year, fresh pages, quiet courage.',
+  'Lead with heart and steady intention.',
+  'Tiny growth still counts as growth.',
+  'Let progress bloom one day at a time.',
+  'Build momentum, then protect your peace.',
+  'Make room for joy and meaningful work.',
+  'Stay bright, even when days feel long.',
+  'Finish strong and stay consistent.',
+  'Reset routines, refocus goals.',
+  'Trust the process and keep moving.',
+  'Be grateful, grounded, and brave.',
+  'Reflect, celebrate, then begin again.',
+] as const;
 
-const QuoteSection: React.FC = () => {
+interface QuoteSectionProps {
+  currentMonth: Date;
+}
+
+const QuoteSection: React.FC<QuoteSectionProps> = ({ currentMonth }) => {
   const quote = useMemo(() => {
-    const dayOfYear = Math.floor(
-      (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-    );
-    return QUOTES[dayOfYear % QUOTES.length];
-  }, []);
+    return QUOTES_BY_MONTH[currentMonth.getMonth()];
+  }, [currentMonth]);
 
   return (
     <motion.div
