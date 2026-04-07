@@ -277,7 +277,6 @@ const Calendar: React.FC = () => {
         <TaskPanel
           currentMonth={state.currentMonth}
           ranges={state.ranges}
-
           importantDates={state.importantDates}
           activeRangeId={state.activeRangeId}
           onSelectRange={state.selectRange}
@@ -294,3 +293,4 @@ const Calendar: React.FC = () => {
 };
 
 export default Calendar;
+

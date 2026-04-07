@@ -91,7 +91,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
       <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
         <h2 className="font-handwriting font-semibold text-sm tracking-wide leading-tight">Important Dates</h2>
         <div className="mt-2.5 space-y-1.5">
-          <input type="date" value={impDate} onChange={(e) => setImpDate(e.target.value)} className="w-full text-[11px] px-2 py-1.5 rounded-lg border border-input bg-background text-foreground" />
+          <input type="date" value={impDate} onChange={(e) => setImpDate(e.target.value)} className="w-full text-[11px] px-2 py-1.5 rounded-lg border border-input bg-background text-foreground dark:text-white [&::-webkit-calendar-picker-indicator]:text-current dark:[&::-webkit-calendar-picker-indicator]:text-white [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:bg-secondary/80 dark:[&::-webkit-calendar-picker-indicator]:bg-muted hover:[&::-webkit-calendar-picker-indicator]:bg-accent" />
           <input value={impTitle} onChange={(e) => setImpTitle(e.target.value)} placeholder="Title" className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background text-foreground" />
           <input value={impDesc} onChange={(e) => setImpDesc(e.target.value)} placeholder="Description (optional)" className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background text-foreground" />
           <div className="flex items-center gap-2 flex-wrap">

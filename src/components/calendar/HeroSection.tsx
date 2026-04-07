@@ -94,14 +94,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ currentMonth, heroImage, setH
         </AnimatePresence>
       </div>
 
-      {/* Upload button */}
+      {/* Toggle upload/reset button */}
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        onClick={() => fileRef.current?.click()}
+        onClick={() => {
+          if (heroImage) {
+            setHeroImage(null);
+          } else {
+            fileRef.current?.click();
+          }
+        }}
         className="absolute bottom-2 right-2 z-20 p-1.5 rounded-full shadow-lg"
         style={{ background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', color: 'white' }}
-        title="Upload cover image"
+        title={heroImage ? "Reset to default seasonal image" : "Upload cover image"}
       >
         <Camera size={14} />
       </motion.button>
