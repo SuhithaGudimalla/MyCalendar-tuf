@@ -32,6 +32,35 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
   const showSaved = isInSavedRange && !!savedRange;
   const showDraft = isInDraftRange && !showSaved;
 
+  const isMobile = typeof window !== 'undefined' ? window.matchMedia('(pointer: coarse)').matches : false;
+  const [longPressTimer, setLongPressTimer] = React.useState<NodeJS.Timeout | null>(null);
+  const [isLongPressed, setIsLongPressed] = React.useState(false);
+
+  const startLongPress = React.useCallback((e: React.TouchEvent) => {
+    if (!isMobile) return;
+    // Removed e.preventDefault() to avoid passive listener error
+    if (longPressTimer) clearTimeout(longPressTimer);
+    const timer = setTimeout(() => {
+      setIsLongPressed(true);
+      onRangeClick(day);
+    }, 500);
+    setLongPressTimer(timer);
+  }, [isMobile, longPressTimer, onRangeClick, day]);
+
+  const cancelLongPress = React.useCallback(() => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+    setIsLongPressed(false);
+  }, [longPressTimer]);
+
+  React.useEffect(() => {
+    return () => {
+      if (longPressTimer) clearTimeout(longPressTimer);
+    };
+  }, []);
+
   let bgClass = '';
   if (today && !showSaved && !showDraft) bgClass = 'bg-calendar-today text-primary-foreground';
   if ((isSavedRangeStart || isSavedRangeEnd) && showSaved) bgClass = 'bg-calendar-today text-primary-foreground';
@@ -48,20 +77,26 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
       whileHover={{ scale: 1.15 }}
       whileTap={{ scale: 0.9 }}
       onClick={(e) => {
+        if (isMobile && isLongPressed) return; // Long press already handled
         if (e.shiftKey) onRangeClick(day);
         else onDateClick(day);
       }}
       onContextMenu={(e) => { e.preventDefault(); onRangeClick(day); }}
+      onTouchStart={startLongPress}
+      onTouchEnd={cancelLongPress}
+      onTouchMove={cancelLongPress}
+      onTouchCancel={cancelLongPress}
       className={`
         relative w-8 h-8 rounded-lg flex items-center justify-center text-xs font-body
-        transition-colors duration-150 cursor-pointer
+        transition-colors duration-150 cursor-pointer ${isMobile ? 'touch-manipulation cursor-default' : 'cursor-pointer'}
         ${!inMonth ? 'opacity-30' : ''}
         ${weekend && inMonth && !today && !isSavedRangeStart && !isSavedRangeEnd && !isDraftRangeStart && !isDraftRangeEnd ? 'text-calendar-weekend' : ''}
         ${bgClass}
         ${!bgClass && inMonth ? 'hover:bg-calendar-hover' : ''}
+        ${isLongPressed ? 'ring-2 ring-primary/50' : ''}
       `}
       style={rangeBg ? { background: rangeBg } : undefined}
-      title={savedRange?.taskTitle || importantDate?.title || (moodEmoji ? `${format(day, 'PPP')} • Mood ${moodEmoji}` : `${format(day, 'PPP')} — Shift+click for range`)}
+      title={savedRange?.taskTitle || importantDate?.title || (moodEmoji ? `${format(day, 'PPP')} • Mood ${moodEmoji}` : `${format(day, 'PPP')} — ${isMobile ? 'Long press' : 'Shift+click / right-click'} for range`)}
     >
       {format(day, 'd')}
       {moodEmoji && (

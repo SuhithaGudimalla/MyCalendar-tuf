@@ -213,7 +213,7 @@ const Calendar: React.FC = () => {
 
               <div className="px-4 pb-2">
                 <p className="text-[8px] text-muted-foreground font-body text-center opacity-50">
-                  Click a date to add notes · Shift+click (or right-click) to create a task range
+                  Click a date to add notes · Shift+click / long press to create a task range
                 </p>
               </div>
 
