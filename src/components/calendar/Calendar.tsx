@@ -273,10 +273,11 @@ const Calendar: React.FC = () => {
         />
       </div>
 
-      <div className="w-full lg:mt-[38px]">
+      <div className="w-full lg:w-[360px] lg:ml-auto lg:self-end lg:mt-0 lg:max-h-[96vh] lg:overflow-y-auto">
         <TaskPanel
           currentMonth={state.currentMonth}
           ranges={state.ranges}
+
           importantDates={state.importantDates}
           activeRangeId={state.activeRangeId}
           onSelectRange={state.selectRange}

@@ -1,53 +1,16 @@
-# Calendar TUF - COMPLETED ✅
+# Task Completion TODO
 
-All Lovable traces removed:
-- Lovable deps/configs/files deleted
-- package.json cleaned to minimal deps
-- index.html title/metas generic
-- vite.config clean
-- Testing folders removed
-- Unused shadcn ui/pages/lib deleted
-- App simplified to direct Calendar render
+## Plan Breakdown
+1. ✅ Understand project files via search_files and read_file (Calendar.tsx, TaskPanel.tsx, CSS, Tailwind config)
+2. ✅ Create detailed edit plan and get user approval
+3. Create TODO.md with steps
+4. ✅ Edit src/components/calendar/Calendar.tsx - Update TaskPanel wrapper for right alignment (ml-auto, self-end, adjust width/margin)
+5. ✅ Edit src/components/calendar/TaskPanel.tsx - Change fonts to handwriting for Productivity, Important Tasks h2, Important Dates h2, task titles, date titles (recreated clean file)
+6. ✅ Test changes (visual check on lg screens) - TaskPanel now right-aligned sidebar with handwriting fonts applied
+7. attempt_completion
 
-Project is now clean standalone React calendar app.
+## Next Step
+Edit Calendar.tsx and TaskPanel.tsx per plan.
 
-npm install done.
+**Status: Approved and proceeding...**
 
-npm run dev to test.
-
-- [ ] Clean index.html (title/metas)
-- [ ] Clean vite.config.ts (remove tagger plugin)
-- [ ] Clean README.md
-- [ ] Audit and delete unused shadcn ui/ components
-
-### Phase 3: Restructure src/
-- [ ] Merge pages/Index.tsx into App.tsx (direct Calendar render)
-- [ ] Move calendar/ components to flat components/
-- [ ] Move hooks/useCalendarState.ts to utils/useCalendarState.ts
-- [ ] Update all imports
-- [ ] Delete unused: pages/NotFound.tsx, App.css, hooks/use-mobile.tsx/use-toast.ts (if unused), components/NavLink.tsx
-- [ ] Update tailwind.config.ts content paths
-
-### Phase 4: Verify and finalize
-- [ ] npm install
-- [ ] npm run dev (test runs, no errors)
-- [ ] npm run build (check)
-- [ ] Manual UI check: no branding, functionality intact
-- [ ] Update TODO.md final status
-- [ ] attempt_completion
-
-Current progress: 0/18 complete.
-
-Next step: Phase 1 deletes.
-Phase 1:
-
-Delete:
-✔ playwright
-✔ vitest
-✔ test folder
-✔ bun files
-
-Keep:
-✖ components.json
-✖ postcss
-✖ eslint
