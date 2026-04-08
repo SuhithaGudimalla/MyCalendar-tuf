@@ -46,7 +46,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
     <div className="w-full lg:w-[330px] flex flex-col gap-2.5 md:gap-3">
       <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-handwriting font-semibold text-sm tracking-wide leading-tight">Productivity</h2>
+          <h2 className="font-medium text-sm tracking-wide leading-tight">Productivity</h2>
           <span className="text-[10px] text-muted-foreground">{format(currentMonth, 'MMMM yyyy')}</span>
         </div>
         <div className="mt-2.5 grid grid-cols-3 gap-1.5">
@@ -58,7 +58,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
 
       <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-handwriting font-semibold text-sm tracking-wide leading-tight">Important Tasks</h2>
+          <h2 className="font-medium text-sm tracking-wide leading-tight">Important Tasks</h2>
           <button onClick={() => onSelectRange(null)} className="text-[10px] text-muted-foreground">Clear</button>
         </div>
         <div className="mt-2.5 space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
@@ -74,7 +74,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: r.color }} />
-                    <span className="font-handwriting font-semibold text-xs tracking-wide leading-tight">{r.taskTitle}</span>
+                    <span className="font-medium text-xs tracking-wide leading-tight">{r.taskTitle}</span>
                   </div>
                   <div className="text-[10px] text-muted-foreground">{fmtRange(r)} · {r.priority}</div>
                 </div>
@@ -89,7 +89,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
       </div>
 
       <div className="bg-card border border-border rounded-xl p-3 shadow-sm">
-        <h2 className="font-handwriting font-semibold text-sm tracking-wide leading-tight">Important Dates</h2>
+        <h2 className="font-medium text-sm tracking-wide leading-tight">Important Dates</h2>
         <div className="mt-2.5 space-y-1.5">
           <input type="date" value={impDate} onChange={(e) => setImpDate(e.target.value)} className="w-full text-[11px] px-2 py-1.5 rounded-lg border border-input bg-background text-foreground dark:text-white [&::-webkit-calendar-picker-indicator]:text-current dark:[&::-webkit-calendar-picker-indicator]:text-white [&::-webkit-calendar-picker-indicator]:p-1 [&::-webkit-calendar-picker-indicator]:bg-secondary/80 dark:[&::-webkit-calendar-picker-indicator]:bg-muted hover:[&::-webkit-calendar-picker-indicator]:bg-accent" />
           <input value={impTitle} onChange={(e) => setImpTitle(e.target.value)} placeholder="Title" className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-input bg-background text-foreground" />
@@ -115,7 +115,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
           {upcoming.map(d => (
             <div key={d.id} className="flex items-center justify-between rounded-lg border border-border bg-background p-2">
               <div>
-                <div className="font-handwriting text-xs font-semibold tracking-wide leading-tight">{d.title}</div>
+                <div className="font-medium text-xs font-semibold tracking-wide leading-tight">{d.title}</div>
                 <div className="text-[10px] text-muted-foreground">{format(parse(d.date, 'yyyy-MM-dd', new Date()), 'PPP')}</div>
               </div>
               <button onClick={() => onDeleteImportantDate(d.id)} className="p-1 rounded hover:bg-destructive/10 text-destructive"><Trash2 size={12} /></button>
@@ -128,4 +128,3 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
 };
 
 export default React.memo(TaskPanel);
-

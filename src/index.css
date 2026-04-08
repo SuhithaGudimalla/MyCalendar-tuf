@@ -96,9 +96,9 @@
   body {
     background: linear-gradient(
       135deg,
-      #fdf2f8,
-      #ffe4e6,
-      #fce7f3
+      #daafb3,
+      #dcd0c3 ,
+      #d4b0b4 
     );
     @apply text-foreground;
     font-family: var(--font-body);
